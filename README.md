@@ -20,7 +20,7 @@ Python 3.9+, standard library only. No continuously streamed video. No private c
 
 [Open the live demo](https://parking-sentinel.vercel.app/), then click **Start monitoring**.
 
-The web page plays the bundled one-minute generated parking video at 1×, with current observations and a detection timeline beside it. Ordinary cars pass a stationary parked-camera viewpoint; a patrol-style car appears later. Detection settings contain the confidence cutoff and optional known test plates. There are no scripted detection scenarios or payment actions.
+The web page plays the bundled one-minute generated parking video at 1×, with current observations and a detection timeline beside it. Ordinary cars pass a stationary parked-camera viewpoint; a patrol-style car appears later. Detection settings contain the confidence cutoff and optional known test plates. There are no scripted detection scenarios or payment actions. The live panel activates only after **Start monitoring**, pauses with the video, and becomes inactive on Stop or playback completion. Pending responses are discarded when monitoring pauses or ends; completed observations remain in session activity.
 
 In a complete hosted browser test on September 9, 2026, seven frames were analyzed and the patrol was flagged in the frame captured at 44.7 seconds, with model-reported confidence 0.95. This is one observed run; inference timing and results can vary.
 
