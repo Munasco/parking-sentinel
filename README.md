@@ -2,7 +2,7 @@
 
 An event-driven parking prototype: **dashcam snapshot → vision model → confidence check → parking session API**.
 
-Python 3.9+, standard library only. No continuously streamed video. No private camera footage, real plate lists, location history, or credentials in this repository. The included public traffic sample is credited in `parking_sentinel/media/ATTRIBUTION.md`.
+Python 3.9+, standard library only. No continuously streamed video. No private camera footage, real plate lists, location history, or credentials in this repository. The included one-minute parking video is generated test footage; its provenance is in `parking_sentinel/media/ATTRIBUTION.md`.
 
 ## What works
 
@@ -18,37 +18,27 @@ Python 3.9+, standard library only. No continuously streamed video. No private c
 
 ### Single-file Gemini preview — no Python or Ollama
 
-Download [`parking-preview.html`](parking-preview.html), open it in a browser, choose your staged parking video from any local folder, and enter your own Gemini API key in the page. Click **Connect / load models**, choose an image-capable model, then **Start 60-second Gemini test**. The page contains a video-generation prompt for a fixed parked-car view, normal vehicles, and a white patrol-style vehicle with roof readers.
+Download [`parking-preview.html`](parking-preview.html) and the [generated one-minute parking clip](parking_sentinel/media/parking-enforcement-staged-60s.mp4), or clone this repo. Open the HTML in a browser, choose the included MP4 from `parking_sentinel/media/`, and enter your own Gemini API key in the page. Click **Connect / load models**, choose an image-capable model, then **Start 60-second Gemini test**. The MP4 is already generated and committed: a fixed parked-car view, ordinary vehicles, and a staged white patrol-style vehicle with roof cameras. No video-generation service is needed to play it.
 
 No installation, WebGPU, video hosting, or local server is required. The file is self-contained; recognition requires internet access and a usable Gemini API key. Keys are held in page memory only and can be removed with **Forget key**. No credentials are bundled in the file or saved in browser storage. This is a personal bring-your-own-key demo, not a place to distribute a shared API credential.
 
-The browser detects pixel changes, samples at most one JPEG every five seconds, sends up to 12 images to Google's `generateContent` API, validates the returned observation, and applies the same plate/appearance rules as the Python version. Repeated matches are suppressed in page memory. Playback stops at 60 seconds or the end of a shorter clip. No payment call exists. Models and API quotas may vary; slow inference can skip events. The browser/API contract and matching rules are tested, but live Gemini recognition has not been validated with a user key or a staged target clip.
+The browser detects pixel changes, samples at most one JPEG every five seconds, sends up to 12 images to Google's `generateContent` API, validates the returned observation, and applies the same plate/appearance rules as the Python version. Repeated matches are suppressed in page memory. Playback stops at 60 seconds or the end of a shorter clip. No payment call exists. Models and API quotas may vary; slow inference can skip events. The default confidence cutoff is 0.98 and can be changed visibly before a run. In an in-app browser test on the included clip, 0.98 rejected the patrol frames as uncertain; a second run at 0.95 sent 11 frames, flagged the patrol at 37.5 seconds, and suppressed a repeat at 48.1 seconds while earlier ordinary cars were ignored. These are observed results for this generated clip, not a guarantee for future runs or real footage.
 
 API references: [Gemini image understanding](https://ai.google.dev/gemini-api/docs/image-understanding), [generateContent structured output](https://ai.google.dev/gemini-api/docs/generate-content/structured-output), [model listing](https://ai.google.dev/api/models).
 
-### Python test bench
-
-For a visual test, start the local simulator:
+### Local video preview
 
 ```sh
 python3 -m parking_sentinel simulate
 ```
 
-Open **http://127.0.0.1:8765** and click **Play 60-second test**. A real recorded traffic video plays at normal speed. No packages, API keys, camera, or model are required for pixel-based motion detection. Stop the server with Ctrl+C; use `--port 8766` if the port is occupied.
+Open **http://127.0.0.1:8765**. The generated one-minute parking clip is already loaded. Preview it with the video controls, or enter your Gemini key, click **Connect / load models**, and then **Start 60-second Gemini test**. No Ollama or WebGPU is required. The server only serves the page and MP4; sampled images go directly from your browser to Gemini.
 
-The player compares actual decoded video frames once per second. Significant changes trigger a snapshot, at most once per five seconds. The latest snapshot shows an outline around changed pixels and its video timestamp. The one-minute test stops automatically, with at most 12 captures. Events are derived from pixels, not a scripted timeline. The included sample contains ongoing moving traffic, so captures recur throughout the minute.
+The player compares decoded frames once per second. Motion triggers a JPEG sample at most once per five seconds, with up to 12 requests per run. Video plays at 1× while inference runs. The displayed observation, confidence check, and duplicate suppression use the model's actual response. There are no scripted scenarios or timed detection results. API latency can cause a brief event to be missed. A generated clip tests a staged case and does not establish accuracy on real parking footage.
 
-**Motion detection is not enforcement recognition.** In motion-only mode, no plate/make analysis is performed, no enforcement result is invented, and no simulated session is created. The changed-pixel outline may cover several cars, headlights, shadows, or camera movement; it is not an object detector's bounding box. The source is prerecorded video replayed in real time, not a connection to a live camera.
+Playback is a prerecorded clip replayed in real time, not a live dashcam connection. Motion alone does not identify enforcement. Recognition requires a usable Gemini API key; playback does not. No payment or checkout endpoint is available in this preview.
 
-To test actual recognition, run Ollama with an installed vision model and export its name as `OLLAMA_MODEL` before starting the simulator. Select **Enforcement recognition** in the analysis selector. The same captured JPEGs then go through `analyze()` and the real decision/duplicate-prevention code. Model setup is not included, and the public night traffic clip is not an enforcement benchmark. Dark/blurry footage or unreadable plates should not be expected to match.
-
-Choose **Use your own video instead** to load a local browser-compatible MP4/WebM. Each run replays its first 60 seconds (or stops at the end of a shorter clip). Only captured frames go to `OLLAMA_URL` when recognition is selected; motion-only analysis stays in the browser. The full video is never uploaded. Sampled images are visible locally in the page; temporary server-side images are removed after inference. Simulator session state is separate from normal CLI state and removed when the server stops.
-
-**Scripted rule tests** remain available as a separate mode. Run the guided sequence to send an ordinary car, a known synthetic plate, the same plate again, and an uncertain sighting through the real Python rules. Expected actions: **ignored → simulated → suppressed → ignored**. This mode supplies observations directly and does not test recognition. `DEMO123` is the only known plate in the simulator; other plates can match only through the appearance fallback.
-
-The simulator binds to loopback and is hardwired to `DryRun`: **it cannot buy parking or open checkout**, even with payment credentials in the environment. The 2 MB public sample is the sole media exception in `.gitignore`; your selected videos and snapshots are not committed.
-
-Sample attribution: *Cars driving at night*, [Editor](https://www.youtube.com/user/Editor), [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/), via [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Cars_driving_at_night.webm). Changes: first 60 seconds, resized to 640 × 360, 15 fps H.264, audio removed. No endorsement implied.
+The generated test MP4 is the sole media exception in `.gitignore`; locally selected videos and snapshots are not committed. See [media provenance](parking_sentinel/media/ATTRIBUTION.md).
 
 For the smaller terminal-only demo:
 

@@ -1,92 +1,56 @@
-import base64
-import json
-import tempfile
 import threading
 import unittest
 import urllib.error
 import urllib.request
 from pathlib import Path
-from unittest.mock import patch
-
-from parking_sentinel.simulator import Simulation, make_server, synthetic_observation
+from parking_sentinel.simulator import make_server, MEDIA
 
 
 class SimulatorTests(unittest.TestCase):
     def setUp(self):
-        self.directory = tempfile.TemporaryDirectory()
-        self.simulation = Simulation(self.directory.name)
+        self.server = make_server(0)
+        self.thread = threading.Thread(target=self.server.serve_forever, daemon=True)
+        self.thread.start()
+        self.base = 'http://127.0.0.1:%s' % self.server.server_port
 
     def tearDown(self):
-        self.directory.cleanup()
+        self.server.shutdown()
+        self.server.server_close()
+        self.thread.join()
 
-    def test_guided_sequence_uses_real_rules_and_duplicate_guard(self):
-        results = [self.simulation.process(synthetic_observation(kind)) for kind in
-                   ("ordinary", "known", "known", "uncertain")]
-        self.assertEqual([r["action"] for r in results], ["ignored", "simulated", "suppressed", "ignored"])
-        self.assertEqual([r["reason"] for r in results], ["no_match", "plate_match", "plate_match", "below_threshold"])
-        self.assertTrue(all(r["payment_enabled"] is False for r in results))
-        self.simulation.reset()
-        self.assertEqual(self.simulation.process(synthetic_observation("visual"))["action"], "simulated")
-
-    def test_frame_passes_bytes_to_vision_and_deletes_temporary_file(self):
-        visited = []
-        raw = b"\xff\xd8\xffsynthetic-test-transport"
-
-        def vision(paths):
-            visited.append(paths[0])
-            self.assertEqual(Path(paths[0]).read_bytes(), raw)
-            return synthetic_observation("visual")
-
-        with patch("parking_sentinel.simulator.analyze", side_effect=vision):
-            result = self.simulation.frame(base64.b64encode(raw).decode())
-        self.assertEqual(result["action"], "simulated")
-        self.assertFalse(Path(visited[0]).exists())
-
-    def test_bad_frames_and_scenarios_rejected(self):
-        for data in (None, "!notbase64", ""):
-            with self.assertRaises(ValueError):
-                self.simulation.frame(data)
-        with self.assertRaises(ValueError):
-            synthetic_observation("pay")
-
-    def test_http_demo_and_token_boundary(self):
-        server = make_server(0, self.simulation)
-        thread = threading.Thread(target=server.serve_forever, daemon=True)
-        thread.start()
-        base = "http://127.0.0.1:%s" % server.server_port
-        try:
-            with urllib.request.urlopen(base) as response:
-                page = response.read().decode()
-                self.assertIn(self.simulation.token, page)
-                self.assertNotIn("__SIMULATION_TOKEN__", page)
-            request = urllib.request.Request(base + "/api/event", data=b'{"scenario":"known"}', headers={"Content-Type": "application/json"})
+    def test_video_preview_has_no_scripted_or_payment_endpoints(self):
+        with urllib.request.urlopen(self.base) as response:
+            page = response.read().decode()
+            self.assertIn('generateContent', page)
+            self.assertIn(MEDIA, page)
+            self.assertNotIn('Scripted rule tests', page)
+            self.assertIn('https://generativelanguage.googleapis.com', response.headers['Content-Security-Policy'])
+        for path in ('/api/event', '/api/frame', '/api/reset', '/checkout'):
+            request = urllib.request.Request(self.base + path, data=b'{}')
             with self.assertRaises(urllib.error.HTTPError) as error:
                 urllib.request.urlopen(request)
-            self.assertEqual(error.exception.code, 403)
-            request.add_header("X-Simulation-Token", self.simulation.token)
-            with patch("parking_sentinel.core.ParkGraph.start", side_effect=AssertionError("No payment allowed")), patch("parking_sentinel.core.AmpCheckout.start", side_effect=AssertionError("No checkout allowed")):
-                with urllib.request.urlopen(request) as response:
-                    self.assertEqual(json.load(response)["action"], "simulated")
-            with urllib.request.urlopen(base + "/api/config") as response:
-                self.assertEqual(json.load(response)["session_status"], "active")
-            media = Path(__file__).resolve().parents[1] / "parking_sentinel/media/demo-traffic.mp4"
-            request = urllib.request.Request(base + "/media/demo-traffic.mp4", headers={"Range": "bytes=0-31"})
+            self.assertEqual(error.exception.code, 405)
+        request = urllib.request.Request(self.base, headers={'Host': 'external.example'})
+        with self.assertRaises(urllib.error.HTTPError) as error:
+            urllib.request.urlopen(request)
+        self.assertEqual(error.exception.code, 403)
+
+    def test_video_ranges_support_playback_and_seeking(self):
+        media = Path(__file__).resolve().parents[1] / 'parking_sentinel/media' / MEDIA
+        for route in ('/media/', '/parking_sentinel/media/'):
+            request = urllib.request.Request(self.base + route + MEDIA, headers={'Range': 'bytes=0-31'})
             with urllib.request.urlopen(request) as response:
                 self.assertEqual(response.status, 206)
                 self.assertEqual(response.read(), media.read_bytes()[:32])
                 self.assertEqual(response.headers['Content-Range'], 'bytes 0-31/%s' % media.stat().st_size)
-            request = urllib.request.Request(base + "/media/demo-traffic.mp4", headers={"Range": "bytes=-16"})
-            with urllib.request.urlopen(request) as response:
-                self.assertEqual(response.read(), media.read_bytes()[-16:])
-            request = urllib.request.Request(base + "/media/demo-traffic.mp4", headers={"Range": "bytes=999999999-"})
-            with self.assertRaises(urllib.error.HTTPError) as error:
-                urllib.request.urlopen(request)
-            self.assertEqual(error.exception.code, 416)
-        finally:
-            server.shutdown()
-            server.server_close()
-            thread.join()
+        request = urllib.request.Request(self.base + '/media/' + MEDIA, headers={'Range': 'bytes=-16'})
+        with urllib.request.urlopen(request) as response:
+            self.assertEqual(response.read(), media.read_bytes()[-16:])
+        request = urllib.request.Request(self.base + '/media/' + MEDIA, headers={'Range': 'bytes=999999999-'})
+        with self.assertRaises(urllib.error.HTTPError) as error:
+            urllib.request.urlopen(request)
+        self.assertEqual(error.exception.code, 416)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     unittest.main()

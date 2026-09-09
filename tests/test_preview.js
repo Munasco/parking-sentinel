@@ -12,6 +12,9 @@ const observation = {plate:'', confidence:0.99, white:true, nissan:true, roof_lp
 assert.equal(detector.decide(observation, []), 'visual_match');
 assert.equal(detector.decide({...observation, plate:'DEMO 123', white:false}, ['demo123']), 'plate_match');
 assert.equal(detector.decide({...observation, confidence:0.6}, []), 'below_threshold');
+assert.equal(detector.decide({...observation, confidence:0.95}, [], 0.95), 'visual_match');
+assert.equal(detector.decide({...observation, confidence:0.95}, [], 0.98), 'below_threshold');
+for(const threshold of [NaN, 0.49, 1.01, '0.95'])assert.throws(()=>detector.decide(observation, [], threshold));
 assert.equal(detector.decide({...observation, roof_lpr:false}, []), 'no_match');
 for (const bad of [{}, {...observation, confidence:NaN}, {...observation, white:'true'}, {...observation, extra:true}]) {
   assert.throws(() => detector.decide(bad, []));
