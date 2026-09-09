@@ -11,7 +11,8 @@ from .core import AmpCheckout, DryRun, ParkGraph, ServiceError, Sessions, analyz
 def main():
     os.umask(0o077)
     parser = argparse.ArgumentParser(description="Snapshot → vision → decision → parking session")
-    parser.add_argument("command", choices=["health", "search", "get", "detect", "demo", "status", "end", "reconcile"])
+    parser.add_argument("command", choices=["simulate", "health", "search", "get", "detect", "demo", "status", "end", "reconcile"])
+    parser.add_argument("--port", type=int, default=8765, help="Local simulator port")
     parser.add_argument("--lat", type=float)
     parser.add_argument("--lng", type=float)
     parser.add_argument("--radius-km", type=float, default=5)
@@ -24,6 +25,10 @@ def main():
     args = parser.parse_args()
     store = None
     try:
+        if args.command == "simulate":
+            from .simulator import serve
+            serve(args.port)
+            return 0
         if args.command == "health":
             print(json.dumps(request_json(ParkGraph.base + "/health")))
             return 0

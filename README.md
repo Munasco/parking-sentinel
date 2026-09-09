@@ -16,6 +16,24 @@ Python 3.9+, standard library only. No continuously streamed video. No camera fo
 
 ## Run
 
+For a visual test, start the local simulator:
+
+```sh
+python3 -m parking_sentinel simulate
+```
+
+Open **http://127.0.0.1:8765** and click **Run guided sequence**. No packages, API keys, camera, or model are needed for the animated demo. Stop the server with Ctrl+C. Use `--port 8766` if the port is occupied.
+
+The sequence sends an ordinary car, a known synthetic plate, the same plate again, and an uncertain sighting through the actual Python decision and session code. Expected results: **ignored → simulated action → duplicate suppressed → ignored**. Clear the test session to start over. The animated scene and observations are scripted; this mode tests the flow rather than image recognition.
+
+To test recognition, run Ollama with an installed vision model and export its name as `OLLAMA_MODEL` before starting the simulator. Select **Test a video**, choose a local MP4/WebM your browser can play, and click **Start vision test**. The player compares small frames once per second; motion above its threshold triggers a JPEG for actual Ollama analysis, with a 5-second cooldown and a limit of 12 snapshots per test. Static scenes do not trigger analysis. Camera movement can trigger it too: frame difference is a test trigger, not a trained vehicle detector. Seek backward or start a new test to replay a scene.
+
+Only sampled frames are sent to the configured `OLLAMA_URL` (localhost by default); the full video remains in the browser. Temporary server-side snapshots are deleted after inference, and simulator state is separate from the CLI state and removed when the server stops. Synthetic plate `DEMO123` is the only known plate in this test bench; actual videos use the appearance fallback for other plates. Vision configuration means the model name is set, not that Ollama is reachable or the model is installed.
+
+The simulator is bound to loopback and hardwired to `DryRun`: **it cannot buy parking or open a checkout**, even when payment environment variables are present. Uploaded media, model observations, and simulation state are not added to this repository. Review local recognition results yourself; no accuracy or timing claim follows from the scripted demo.
+
+For the smaller terminal-only demo:
+
 ```sh
 python3 -m parking_sentinel demo
 python3 -m parking_sentinel status
@@ -89,7 +107,7 @@ Copy `.env.example` to `.env`, edit it, and load it with `source .env` if desire
 
 `--observation examples/observation.json` exercises the decision pipeline without a model. These values are synthetic. The vision model is not trained or calibrated by this repository; its confidence score is a heuristic, not a measured error rate. No pedestrian classifier is included.
 
-The dashcam must supply snapshots to the command; camera firmware/export integration is device-specific and is not included. Invoke once per camera event. No background watcher or scheduler is installed.
+The dashcam must supply snapshots to the command; camera firmware/export integration is device-specific and is not included. Invoke once per camera event. No background watcher or scheduler is installed. The simulator's local video player is a test harness for that event-to-snapshot boundary, not a direct live dashcam connection.
 
 State defaults to `.local/sessions.sqlite3`; use `--state` for another path. A pending record is committed before each network write. Timeouts, invalid receipts, and crashes keep the guard in place. Requests are never automatically retried. Inspect the provider dashboard and resolve any session before using `reconcile --confirmed-ended`.
 
