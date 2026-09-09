@@ -24,9 +24,9 @@ The web page plays the bundled one-minute generated parking video at 1×, with c
 
 In a complete hosted browser test on September 9, 2026, seven frames were analyzed and the patrol was flagged in the frame captured at 44.7 seconds, with model-reported confidence 0.95. This is one observed run; inference timing and results can vary.
 
-Gemini image recognition runs behind `/api/analyze` on the backend. The browser sends a JPEG only when it observes motion, at most once every five seconds and up to 12 times per run. Results appear when inference completes while the video keeps playing. Slow responses can miss brief events. A model's reported confidence is not a measured accuracy rate; the web preview starts at a 0.95 cutoff and is adjustable before a run. The CLI retains its stricter 0.98 default.
+Gemini image recognition runs behind `/api/analyze` on the backend. The browser sends a JPEG only when it observes motion, at most once every two seconds and up to 30 times per run. Results appear when inference completes while the video keeps playing. Slow responses can miss brief events. A model's reported confidence is not a measured accuracy rate; the web preview starts at a 0.95 cutoff and is adjustable before a run. The CLI retains its stricter 0.98 default.
 
-The Gemini API key is a server-only environment variable, `GEMINI_API_KEY`. It is never embedded in the page or returned by the backend. Requests use a fixed parking-analysis prompt and a bounded JPEG input; clients cannot supply arbitrary model prompts. The deployed Vercel firewall limits `/api/analyze` to 24 requests per minute per IP. This is a rate limit, not a total spending cap.
+The Gemini API key is a server-only environment variable, `GEMINI_API_KEY`. It is never embedded in the page or returned by the backend. Requests use a fixed parking-analysis prompt and a bounded JPEG input; clients cannot supply arbitrary model prompts. The deployed Vercel firewall limits `/api/analyze` to 30 requests per minute per IP. This is a rate limit, not a total spending cap.
 
 ### Run locally
 

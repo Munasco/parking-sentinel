@@ -16,7 +16,7 @@
 <label for="plates">Known test plates (optional)</label><input id="plates" value="DEMO123" autocomplete="off" spellcheck="false">
 <label for="threshold">Minimum confidence</label><input id="threshold" type="number" min="0.5" max="1" step="0.01" value="0.95">
 <p class="small">DEMO123 is fictional. Lower cutoffs accept more uncertain observations. Model confidence is not a measured accuracy rate.</p>
-<p class="small">Up to 12 snapshots per run are analyzed through the server. The full video stays in your browser.</p>
+<p class="small">Up to 30 snapshots per run are analyzed through the server. The full video stays in your browser.</p>
 </div></div></details>
 <div class="layout"><section>
 <div class="feed"><div class="feed-top"><span class="eyebrow">Parked camera · 60-second video</span><span class="state" id="run-state">Ready</span></div>
@@ -116,7 +116,7 @@ const ParkingDetector = (() => {
     requestAnimationFrame(sample);
     if(!running||busy||video.paused||video.seeking||video.readyState<2||now-lastSample<1000||video.currentTime>=60)return;
     lastSample=now;smallContext.drawImage(video,0,0,96,54);const pixels=smallContext.getImageData(0,0,96,54).data;const motion=ParkingDetector.moving(previous,pixels);previous=new Uint8ClampedArray(pixels);
-    if(!motion||now-lastSend<5000||sent>=12)return;
+    if(!motion||now-lastSend<2000||sent>=30)return;
     const id=run,time=video.currentTime.toFixed(1);lastSend=now;busy=true;sent++;$('sent').textContent=sent;controls();
     frame.width=Math.min(960,video.videoWidth);frame.height=Math.max(1,Math.round(frame.width*video.videoHeight/video.videoWidth));frame.getContext('2d').drawImage(video,0,0,frame.width,frame.height);
     const image=frame.toDataURL('image/jpeg',0.85);$('capture').src=image;$('capture').hidden=false;$('capture-time').textContent='Actual frame captured at '+time+'s';$('result').textContent='Analyzing frame '+sent;$('detail').textContent='Video continues at normal speed.';
