@@ -4,27 +4,29 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Parking Sentinel · Test bench</title>
 <style>
-:root{color-scheme:dark;font:15px/1.5 system-ui,sans-serif;color:#e5eee9;background:#101714}*{box-sizing:border-box}body{margin:0}main{max-width:1160px;margin:auto;padding:28px}header{display:flex;gap:20px;justify-content:space-between;align-items:center;margin-bottom:26px}h1{font-size:24px;margin:0}h2{font-size:17px;margin:0 0 12px}p{margin:8px 0;color:#abbeb2}.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#9ac3aa}.badge{border:1px solid #46715a;border-radius:30px;padding:7px 12px;color:#b9edca;white-space:nowrap}.layout{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(280px,1fr);gap:24px}section{min-width:0}.screen{position:relative;overflow:hidden;border:1px solid #3e5145;border-radius:14px;background:#1b2821;aspect-ratio:16/9}canvas,video{width:100%;height:100%;display:block;object-fit:contain}.screen-label{position:absolute;left:14px;top:12px;background:#101714dd;padding:4px 9px;border-radius:6px;font-size:12px}.controls{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}button,select,input{font:inherit}button,select{border:1px solid #476251;background:#253b2d;color:#f0fff5;border-radius:8px;padding:9px 13px}button{cursor:pointer}button.primary{background:#b2e8c0;color:#102018;border-color:#b2e8c0}button:disabled{opacity:.45;cursor:default}button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid #c5f7d0;outline-offset:3px}.modes{display:flex;gap:8px;margin-bottom:15px}.modes button[aria-pressed=true]{background:#d5e9dc;color:#102018}label{display:block;color:#b5c7bb;margin:8px 0}select{width:100%}.stage{padding:14px 0;border-bottom:1px solid #304336;display:grid;grid-template-columns:28px 1fr;gap:10px}.stage .number{color:#8eaf9a}.stage strong{font-weight:600}.stage p{font-size:13px;margin:3px 0}.stage.active strong{color:#b7f5c9}.result{margin-top:20px;padding:16px;background:#203529;border-radius:10px}.result strong{font-size:20px}.trace{margin-top:28px;border-top:1px solid #304336;padding-top:18px}.trace ul{padding:0;list-style:none}.trace li{padding:9px 0;border-bottom:1px solid #25372c;font-size:13px}.trace time{color:#8eaf9a;margin-right:10px}.metrics{display:flex;gap:24px;margin:16px 0;color:#b9cdbf}.metrics strong{color:#f2fff6}.small{font-size:13px}code{color:#c4eed0;overflow-wrap:anywhere}details{margin-top:14px}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;color:#b7cabb}.error{color:#ffb6ac}input[type=file]{max-width:100%}[hidden]{display:none!important}@media(max-width:760px){main{padding:18px}.layout{grid-template-columns:1fr}header{align-items:flex-start;flex-direction:column}.metrics{gap:15px;font-size:13px}}
+:root{color-scheme:dark;font:15px/1.5 system-ui,sans-serif;color:#e5eee9;background:#101714}*{box-sizing:border-box}body{margin:0}main{max-width:1160px;margin:auto;padding:28px}header{display:flex;gap:20px;justify-content:space-between;align-items:center;margin-bottom:26px}h1{font-size:24px;margin:0}h2{font-size:17px;margin:0 0 12px}p{margin:8px 0;color:#abbeb2}.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#9ac3aa}.badge{border:1px solid #46715a;border-radius:30px;padding:7px 12px;color:#b9edca;white-space:nowrap}.layout{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(280px,1fr);gap:24px}section{min-width:0}.screen{position:relative;overflow:hidden;border:1px solid #3e5145;border-radius:14px;background:#1b2821;aspect-ratio:16/9}canvas,video{width:100%;height:100%;display:block;object-fit:contain}.screen-label{position:absolute;left:14px;top:12px;background:#101714dd;padding:4px 9px;border-radius:6px;font-size:12px}.controls{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}button,select,input{font:inherit}button,select{border:1px solid #476251;background:#253b2d;color:#f0fff5;border-radius:8px;padding:9px 13px}button{cursor:pointer}button.primary{background:#b2e8c0;color:#102018;border-color:#b2e8c0}button:disabled{opacity:.45;cursor:default}button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid #c5f7d0;outline-offset:3px}.modes{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:15px}.modes button[aria-pressed=true]{background:#d5e9dc;color:#102018}label{display:block;color:#b5c7bb;margin:8px 0}select{width:100%}.stage{padding:14px 0;border-bottom:1px solid #304336;display:grid;grid-template-columns:28px 1fr;gap:10px}.stage .number{color:#8eaf9a}.stage strong{font-weight:600}.stage p{font-size:13px;margin:3px 0}.stage.active strong{color:#b7f5c9}.result{margin-top:20px;padding:16px;background:#203529;border-radius:10px}.result strong{font-size:20px}.trace{margin-top:28px;border-top:1px solid #304336;padding-top:18px}.trace ul{padding:0;list-style:none}.trace li{padding:9px 0;border-bottom:1px solid #25372c;font-size:13px}.trace time{color:#8eaf9a;margin-right:10px}.metrics{display:flex;gap:24px;margin:16px 0;color:#b9cdbf}.metrics strong{color:#f2fff6}.small{font-size:13px}code{color:#c4eed0;overflow-wrap:anywhere}details{margin-top:14px}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;color:#b7cabb}.error{color:#ffb6ac}input[type=file]{max-width:100%}[hidden]{display:none!important}@media(max-width:760px){main{padding:18px}.layout{grid-template-columns:1fr}header{align-items:flex-start;flex-direction:column}.metrics{gap:15px;font-size:13px}}
+.evidence{margin-top:16px}.evidence img{display:block;width:100%;border-radius:8px}.evidence figcaption{font-size:12px;color:#b9cdbf;margin-top:6px}figure{margin:0}.screen.detected{border-color:#b2e8c0}.small a{color:#b2e8c0}#clock{font-variant-numeric:tabular-nums}
 </style>
 </head>
 <body><main>
 <header><div><div class="eyebrow">Parking Sentinel / local test bench</div><h1>Watch an event become a decision.</h1></div><span class="badge">Payment disabled</span></header>
-<div class="modes" aria-label="Test mode"><button id="demo-mode" aria-pressed="true">1. Animated demo</button><button id="video-mode" aria-pressed="false">2. Test a video</button></div>
+<div class="modes" aria-label="Test mode"><button id="video-mode" aria-pressed="true">1. One-minute video</button><button id="demo-mode" aria-pressed="false">2. Scripted rule tests</button></div>
 <div class="layout"><section>
-<div class="screen"><canvas id="scene" width="960" height="540" aria-label="Animated synthetic parking scene"></canvas><video id="video" controls playsinline muted hidden></video><span id="screen-label" class="screen-label">SYNTHETIC FEED · no camera connected</span></div>
-<div id="demo-controls">
+<div class="screen" id="screen"><canvas id="scene" hidden width="960" height="540" aria-label="Animated synthetic parking scene"></canvas><video id="video" controls playsinline muted preload="metadata" src="/media/demo-traffic.mp4"></video><span id="screen-label" class="screen-label">RECORDED VIDEO · real-time playback</span></div>
+<div id="demo-controls" hidden>
 <label for="scenario">Vehicle entering the scene</label><select id="scenario"><option value="ordinary">Ordinary car → ignore</option><option value="known">Known demo plate → match</option><option value="visual">Matching appearance → match</option><option value="uncertain">Uncertain sighting → ignore</option></select>
 <div class="controls"><button id="pass" class="primary">Send vehicle past camera</button><button id="tour">Run guided sequence</button></div>
 <p class="small">The animation supplies a scripted observation. The Python decision rules and duplicate guard are real; image recognition is simulated in this mode.</p>
 </div>
-<div id="video-controls" hidden>
-<label for="file">Choose a local video (stays on this computer)</label><input id="file" type="file" accept="video/*">
-<div class="controls"><button id="start-video" class="primary" disabled>Start vision test</button><button id="stop-video" disabled>Stop analysis</button></div>
+<div id="video-controls">
+<div class="controls"><button id="start-video" class="primary">Play 60-second test</button><button id="stop-video" disabled>Stop test</button><span id="clock">00:00 / 01:00 · 1×</span></div>
+<label for="recognition">How to analyze captured frames</label><select id="recognition"><option value="motion">Motion detection · works now, no model required</option><option value="ollama" id="ollama-option" disabled>Enforcement recognition · requires Ollama</option></select>
 <p id="vision-config" class="small">Checking vision configuration…</p>
-<p class="small">Samples motion once per second. At most one snapshot every 5 seconds, and 12 snapshots per test. Frames go to your configured Ollama endpoint; the full video is never uploaded.</p>
-<p class="small">Simple frame differences trigger snapshots here. Camera movement can also trigger them; this is a test harness, not a dashcam vehicle detector.</p>
+<details><summary>Use your own video instead</summary><label for="file">Select a local MP4/WebM</label><input id="file" type="file" accept="video/*"><button id="load-sample">Restore included sample</button></details>
+<p class="small" id="video-credit">Footage: <a href="https://commons.wikimedia.org/wiki/File:Cars_driving_at_night.webm" target="_blank" rel="noreferrer">Cars driving at night</a> by Editor, <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noreferrer">CC BY 3.0</a>. First 60 seconds, resized, silent. Recorded traffic, not a live camera.</p>
+<p class="small">Each second, compare actual frames for movement. Capture at most once every 5 seconds. Motion alone never identifies enforcement or creates a session.</p>
 </div>
-<div class="metrics"><span>Events <strong id="events">0</strong></span><span>Accepted <strong id="accepted">0</strong></span><span>Session <strong id="session">idle</strong></span></div>
+<div class="metrics"><span>Events <strong id="events">0</strong></span><span>Matches <strong id="accepted">0</strong></span><span>Session <strong id="session">idle</strong></span></div>
 <button id="reset">Clear test session</button>
 </section><section>
 <h2>What the program is doing</h2>
@@ -32,47 +34,95 @@
 <div class="stage" id="stage-frame"><span class="number">02</span><div><strong>Capture an event snapshot</strong><p id="frame-detail">Idle video does not call the vision model.</p></div></div>
 <div class="stage" id="stage-vision"><span class="number">03</span><div><strong>Read the observation</strong><p id="vision-detail">Plate, vehicle attributes, and confidence.</p></div></div>
 <div class="stage" id="stage-decision"><span class="number">04</span><div><strong>Apply the actual Python rules</strong><p id="decision-detail">Threshold: 0.98. Known synthetic plate: DEMO123.</p></div></div>
-<div class="result" aria-live="polite"><div class="eyebrow">Latest result</div><strong id="result">Ready to test</strong><p id="result-detail">Start with an ordinary car, then send a matching vehicle twice.</p></div>
+<div class="result" aria-live="polite"><div class="eyebrow">Latest result</div><strong id="result">Ready to test</strong><p id="result-detail">Play the one-minute clip to see motion-triggered snapshots appear here.</p></div>
+<figure class="evidence" id="evidence" hidden><img id="capture" alt="Latest sampled video frame, with the area of changed pixels outlined"><figcaption id="capture-detail"></figcaption></figure>
 <details><summary>Inspect the latest observation</summary><pre id="observation">No event yet.</pre></details>
 </section></div>
 <section class="trace"><h2>Event log</h2><ul id="log" aria-live="polite"><li>No events yet.</li></ul></section>
 <p class="small">A match creates only a simulated session. This server has no payment routes. Tests prove the flow; real recognition accuracy depends on your footage and model.</p>
 </main>
+<script src="/motion.js"></script>
 <script>
 (() => {
 const token='__SIMULATION_TOKEN__';
 const $=id=>document.getElementById(id);
 const canvas=$('scene'), ctx=canvas.getContext('2d'), video=$('video');
-let busy=false, mode='demo', running=false, vehicle=null, sequence=false, events=0, accepted=0;
-let visionReady=false, videoURL=null, frameCount=0, lastSample=0, lastTrigger=-Infinity, previousPixels=null;
-const sampler=document.createElement('canvas');sampler.width=64;sampler.height=36;const sampleCtx=sampler.getContext('2d',{willReadFrequently:true});
+let busy=false, mode='video', running=false, vehicle=null, sequence=false, events=0, accepted=0;
+let visionReady=false, videoURL='/media/demo-traffic.mp4', frameCount=0, lastSample=0, lastTrigger=-Infinity, previousPixels=null;
+const sampler=document.createElement('canvas');sampler.width=96;sampler.height=54;const sampleCtx=sampler.getContext('2d',{willReadFrequently:true});
 const snapshot=document.createElement('canvas');
 const messages={no_match:'Ordinary vehicle — ignored',below_threshold:'Confidence too low — ignored',plate_match:'Known demo plate matched',visual_match:'Appearance matched'};
 async function api(path,body){const response=await fetch(path,{method:'POST',headers:{'Content-Type':'application/json','X-Simulation-Token':token},body:JSON.stringify(body)});const data=await response.json();if(!response.ok)throw Error(data.error||'Request failed');return data;}
 function log(text){const list=$('log');if(!events&&list.children.length===1&&list.firstChild.textContent==='No events yet.')list.replaceChildren();const item=document.createElement('li');const stamp=document.createElement('time');stamp.textContent=new Date().toLocaleTimeString();item.append(stamp,document.createTextNode(text));list.prepend(item);while(list.children.length>20)list.lastChild.remove();}
 function stage(name,text){for(const el of document.querySelectorAll('.stage'))el.classList.remove('active');$('stage-'+name).classList.add('active');$(name+'-detail').textContent=text;}
-function controls(){ $('scenario').disabled=busy||sequence; $('pass').disabled=busy||sequence; $('tour').disabled=busy||sequence; $('reset').disabled=busy||sequence||running; $('demo-mode').disabled=busy||sequence||running; $('video-mode').disabled=busy||sequence||running; $('file').disabled=busy||running; $('start-video').disabled=!visionReady||!videoURL||busy||running; $('stop-video').disabled=!running; }
+function controls(){ $('recognition').disabled=busy||running;$('load-sample').disabled=busy||running;$('scenario').disabled=busy||sequence; $('pass').disabled=busy||sequence; $('tour').disabled=busy||sequence; $('reset').disabled=busy||sequence||running; $('demo-mode').disabled=busy||sequence||running; $('video-mode').disabled=busy||sequence||running; $('file').disabled=busy||running; $('start-video').disabled=!videoURL||busy||running||($('recognition').value==='ollama'&&!visionReady); $('stop-video').disabled=!running; }
 function show(data){events++;if(data.action==='simulated')accepted++;$('events').textContent=events;$('accepted').textContent=accepted;$('session').textContent=data.status;$('observation').textContent=JSON.stringify(data.observation,null,2);stage('decision',messages[data.reason]||data.reason);$('result').classList.remove('error');$('result').textContent=data.action==='suppressed'?'Duplicate prevented':data.action==='simulated'?'Match accepted · simulation':'No action';$('result-detail').textContent=data.action==='suppressed'?'An active test session already exists. No second action was created.':messages[data.reason];log((messages[data.reason]||data.reason)+' → '+data.action);}
 function error(exc){$('result').textContent='Test stopped';$('result').classList.add('error');$('result-detail').textContent=exc.message;log('Error: '+exc.message);}
 function drawScene(now){ctx.fillStyle='#24372b';ctx.fillRect(0,0,960,540);ctx.fillStyle='#455149';ctx.fillRect(0,155,960,215);ctx.strokeStyle='#c0bb90';ctx.lineWidth=3;ctx.setLineDash([35,30]);ctx.beginPath();ctx.moveTo(0,260);ctx.lineTo(960,260);ctx.stroke();ctx.setLineDash([]);ctx.strokeStyle='#849c88';ctx.lineWidth=2;for(let x=30;x<960;x+=150){ctx.strokeRect(x,385,115,130);ctx.strokeRect(x,14,115,125);}for(const x of [190,490,790]){ctx.fillStyle='#718181';ctx.fillRect(x,409,76,88);ctx.fillStyle='#243d40';ctx.fillRect(x+9,428,58,34);}ctx.strokeStyle='#ace8b9';ctx.setLineDash([8,8]);ctx.beginPath();ctx.moveTo(620,155);ctx.lineTo(620,370);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#d5e8d9';ctx.font='18px system-ui';ctx.fillText('Snapshot trigger',635,352);ctx.fillText('YOUR CAMERA',35,525);if(vehicle){const progress=Math.min((now-vehicle.start)/3000,1);const x=980-progress*1170;ctx.fillStyle=vehicle.kind==='ordinary'?'#b56b55':'#f1eee0';ctx.fillRect(x,184,150,70);ctx.fillStyle='#223d42';ctx.fillRect(x+25,195,82,48);if(vehicle.kind!=='ordinary'){ctx.fillStyle='#67a8d6';ctx.fillRect(x+14,245,117,8);ctx.fillStyle='#19251f';ctx.fillRect(x+32,172,18,12);ctx.fillRect(x+101,172,18,12);}if(x<620&&!vehicle.sent){vehicle.sent=true;vehicle.trigger();}if(progress===1){const finish=vehicle.finish;vehicle=null;finish();}}requestAnimationFrame(drawScene);}
 async function sendVehicle(kind){busy=true;controls();stage('feed','A '+(kind==='ordinary'?'normal':'test')+' vehicle is entering the scene.');let request;
 await new Promise(resolve=>{vehicle={kind,start:performance.now(),sent:false,finish:resolve,trigger:()=>{stage('frame','Synthetic event snapshot captured.');$('vision-detail').textContent='Scripted observation for '+kind+' scenario; no VLM call.';request=api('/api/event',{scenario:kind}).then(show).catch(error);}};});
 await request;busy=false;controls();}
-async function clear(){await api('/api/reset',{});events=accepted=0;$('events').textContent='0';$('accepted').textContent='0';$('session').textContent='idle';$('result').textContent='Ready to test';$('result').classList.remove('error');$('result-detail').textContent='Test session cleared. Matching events can be accepted again.';$('observation').textContent='No event yet.';$('log').replaceChildren();for(const el of document.querySelectorAll('.stage'))el.classList.remove('active');$('feed-detail').textContent='Waiting for a vehicle.';$('frame-detail').textContent='Idle video does not call the vision model.';$('vision-detail').textContent='Plate, vehicle attributes, and confidence.';$('decision-detail').textContent='Threshold: 0.98. Known synthetic plate: DEMO123.';}
+async function clear(){await api('/api/reset',{});events=accepted=0;$('events').textContent='0';$('accepted').textContent='0';$('session').textContent='idle';$('result').textContent='Ready to test';$('result').classList.remove('error');$('result-detail').textContent='Test session cleared. Matching events can be accepted again.';$('observation').textContent='No event yet.';$('evidence').hidden=true;$('screen').classList.remove('detected');$('log').replaceChildren();for(const el of document.querySelectorAll('.stage'))el.classList.remove('active');$('feed-detail').textContent='Waiting for a vehicle.';$('frame-detail').textContent='Idle video does not call the vision model.';$('vision-detail').textContent='Plate, vehicle attributes, and confidence.';$('decision-detail').textContent='Threshold: 0.98. Known synthetic plate: DEMO123.';}
 $('pass').onclick=()=>sendVehicle($('scenario').value);
 $('tour').onclick=async()=>{sequence=true;controls();try{await clear();for(const kind of ['ordinary','known','known','uncertain']){ $('scenario').value=kind;await sendVehicle(kind); }}catch(exc){error(exc);}finally{sequence=false;controls();}};
 $('reset').onclick=async()=>{busy=true;controls();try{await clear();}catch(exc){error(exc);}finally{busy=false;controls();}};
-function setMode(next){mode=next;video.pause();$('scene').hidden=next!=='demo';video.hidden=next!=='video';$('demo-controls').hidden=next!=='demo';$('video-controls').hidden=next!=='video';$('demo-mode').setAttribute('aria-pressed',String(next==='demo'));$('video-mode').setAttribute('aria-pressed',String(next==='video'));$('screen-label').textContent=next==='demo'?'SYNTHETIC FEED · no camera connected':'LOCAL VIDEO · recognition test';controls();}
+function setMode(next){mode=next;video.pause();$('scene').hidden=next!=='demo';video.hidden=next!=='video';$('demo-controls').hidden=next!=='demo';$('video-controls').hidden=next!=='video';$('demo-mode').setAttribute('aria-pressed',String(next==='demo'));$('video-mode').setAttribute('aria-pressed',String(next==='video'));$('screen-label').textContent=next==='demo'?'RECORDED VIDEO · real-time playback':'RECORDED VIDEO · real-time playback';controls();}
 $('demo-mode').onclick=()=>setMode('demo');$('video-mode').onclick=()=>setMode('video');
-$('file').onchange=()=>{const file=$('file').files[0];if(!file)return;if(videoURL)URL.revokeObjectURL(videoURL);videoURL=URL.createObjectURL(file);video.src=videoURL;previousPixels=null;controls();};
-function stop(){running=false;controls();}
-$('stop-video').onclick=()=>{stop();log('Analysis stopped. An in-flight observation may still complete.');};
-video.onended=stop;
+function loadSource(url, own) {
+  if(videoURL && videoURL.startsWith('blob:')) URL.revokeObjectURL(videoURL);
+  videoURL=url;video.src=url;previousPixels=null;$('video-credit').hidden=own;controls();
+}
+$('file').onchange=()=>{const file=$('file').files[0];if(file)loadSource(URL.createObjectURL(file),true);};
+$('load-sample').onclick=()=>loadSource('/media/demo-traffic.mp4',false);
+$('recognition').onchange=controls;
+function stop(){running=false;video.pause();controls();}
+$('stop-video').onclick=()=>{stop();log('Test stopped. An in-flight recognition request may still complete.');};
+function complete(){if(!running)return;stop();log('Playback complete: '+frameCount+' motion-triggered snapshots; '+accepted+' enforcement matches.');}
+video.onended=complete;
 video.onseeking=()=>{previousPixels=null;lastTrigger=-Infinity;};
-video.onerror=()=>{stop();error(Error('This video format could not be decoded. Try a browser-compatible MP4 or WebM.'));};
-$('start-video').onclick=async()=>{frameCount=0;previousPixels=null;lastTrigger=-Infinity;lastSample=0;running=true;controls();try{await video.play();stage('feed','Video playing; waiting for motion between frames.');}catch(exc){stop();error(exc);}};
-async function sample(now){requestAnimationFrame(sample);if(!running||busy||video.paused||video.seeking||video.readyState<2||now-lastSample<1000)return;lastSample=now;sampleCtx.drawImage(video,0,0,64,36);const pixels=sampleCtx.getImageData(0,0,64,36).data;let motion=0;if(previousPixels){for(let i=0;i<pixels.length;i+=4)motion+=(Math.abs(pixels[i]-previousPixels[i])+Math.abs(pixels[i+1]-previousPixels[i+1])+Math.abs(pixels[i+2]-previousPixels[i+2]))/3;motion/=64*36;}previousPixels=new Uint8ClampedArray(pixels);stage('feed','Motion score '+motion.toFixed(1)+' / trigger above 8.0');if(motion<=8||now-lastTrigger<5000)return;lastTrigger=now;frameCount++;busy=true;controls();snapshot.width=Math.min(960,video.videoWidth);snapshot.height=Math.max(1,Math.round(snapshot.width*video.videoHeight/video.videoWidth));snapshot.getContext('2d').drawImage(video,0,0,snapshot.width,snapshot.height);stage('vision','Analyzing snapshot '+frameCount+' of 12 with configured Ollama…');$('frame-detail').textContent='One local JPEG sampled from the playing video.';try{const data=await api('/api/frame',{image:snapshot.toDataURL('image/jpeg',0.8).split(',')[1]});show(data);}catch(exc){stop();error(exc);}finally{busy=false;if(frameCount>=12){stop();log('12-snapshot limit reached. Analysis stopped.');}controls();}}
-fetch('/api/config').then(r=>r.json()).then(config=>{visionReady=config.vision_configured;$('session').textContent=config.session_status;if(config.session_status==='active'){$('result').textContent='Existing test session';$('result-detail').textContent='The server still has an active test session. Clear it to accept a fresh match.';}$('vision-config').textContent=visionReady?'Ollama model configured. Select a video to test actual recognition.':'To enable recognition: set OLLAMA_MODEL to an installed vision model, run Ollama, and restart this simulator.';controls();}).catch(error);
+video.onratechange=()=>{if(running&&video.playbackRate!==1)video.playbackRate=1;};
+video.onerror=()=>{stop();error(Error('Cannot decode this video. Choose a browser-compatible MP4 or WebM.'));};
+function updateClock(){const seconds=Math.min(60,Math.floor(video.currentTime||0));$('clock').textContent=String(Math.floor(seconds/60)).padStart(2,'0')+':'+String(seconds%60).padStart(2,'0')+' / 01:00 · 1×';if(running&&video.currentTime>=60)complete();}
+video.ontimeupdate=updateClock;
+$('start-video').onclick=async()=>{
+  busy=true;controls();
+  try{await clear();frameCount=0;previousPixels=null;lastTrigger=-Infinity;lastSample=0;video.currentTime=0;video.playbackRate=1;running=true;await video.play();stage('feed','Watching real frames at normal playback speed.');}
+  catch(exc){stop();error(exc);}finally{busy=false;controls();}
+};
+function captureFrame(box){
+  snapshot.width=Math.min(960,video.videoWidth);snapshot.height=Math.max(1,Math.round(snapshot.width*video.videoHeight/video.videoWidth));
+  const context=snapshot.getContext('2d');context.drawImage(video,0,0,snapshot.width,snapshot.height);
+  const raw=snapshot.toDataURL('image/jpeg',0.85);
+  if(box){context.strokeStyle='#a5ffb3';context.lineWidth=3;context.strokeRect(box.x*snapshot.width,box.y*snapshot.height,box.width*snapshot.width,box.height*snapshot.height);}
+  $('capture').src=snapshot.toDataURL('image/jpeg',0.85);$('evidence').hidden=false;
+  $('capture-detail').textContent='Captured at '+video.currentTime.toFixed(1)+'s · outline shows changed pixels, not a vehicle classification.';
+  return raw.split(',')[1];
+}
+async function sample(now){
+  requestAnimationFrame(sample);
+  if(!running||busy||video.paused||video.seeking||video.readyState<2||now-lastSample<1000)return;
+  if(video.currentTime>=60){complete();return;}
+  lastSample=now;sampleCtx.drawImage(video,0,0,96,54);
+  const pixels=sampleCtx.getImageData(0,0,96,54).data;
+  const motion=SentinelMotion.compareFrames(previousPixels,pixels,96,54);
+  previousPixels=new Uint8ClampedArray(pixels);
+  stage('feed',motion.detected?'Movement visible in '+motion.changed+' sampled pixels.':'Watching video; no significant frame change.');
+  $('screen').classList.toggle('detected',motion.detected);
+  if(!motion.detected||now-lastTrigger<5000||frameCount>=12)return;
+  lastTrigger=now;frameCount++;const time=video.currentTime.toFixed(1);const image=captureFrame(motion.box);
+  $('frame-detail').textContent='Actual frame captured at '+time+' seconds ('+frameCount+'/12).';
+  if($('recognition').value==='motion'){
+    events++;$('events').textContent=events;$('result').classList.remove('error');$('result').textContent='Motion detected at '+time+'s';
+    $('result-detail').textContent='Snapshot captured from video pixels. Enforcement recognition was not run.';
+    $('vision-detail').textContent='Motion-only mode; no VLM inference.';$('decision-detail').textContent='No enforcement decision; no session created.';
+    $('observation').textContent=JSON.stringify({type:'motion_only',video_seconds:Number(time),changed_pixels:motion.changed,score:Number(motion.score.toFixed(2)),enforcement:'not_evaluated'},null,2);
+    log(time+'s · motion detected → snapshot captured → recognition not run');return;
+  }
+  busy=true;controls();stage('vision','Ollama is analyzing snapshot '+frameCount+' of 12…');
+  try{const data=await api('/api/frame',{image});show(data);log(time+'s · real frame → Ollama → '+data.reason);}
+  catch(exc){stop();error(exc);}finally{busy=false;controls();}
+}
+fetch('/api/config').then(r=>r.json()).then(config=>{visionReady=config.vision_configured;$('ollama-option').disabled=!visionReady;$('session').textContent=config.session_status;if(config.session_status==='active'){$('result').textContent='Existing test session';$('result-detail').textContent='The server still has an active test session. Clear it to accept a fresh match.';}$('vision-config').textContent=visionReady?'Real video motion testing is ready. Ollama recognition is also configured.':'Motion detection works immediately. Enforcement recognition needs a running Ollama vision model; it is not configured here.';controls();}).catch(error);
 controls();requestAnimationFrame(drawScene);requestAnimationFrame(sample);
 })();
 </script></body></html>

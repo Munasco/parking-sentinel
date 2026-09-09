@@ -3,6 +3,7 @@ import base64
 import binascii
 import json
 import os
+import re
 import secrets
 import tempfile
 import threading
@@ -89,7 +90,7 @@ def make_server(port, simulation):
             self.send_header("Content-Length", str(len(raw)))
             self.send_header("Cache-Control", "no-store")
             self.send_header("X-Content-Type-Options", "nosniff")
-            self.send_header("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src blob:; connect-src 'self'; frame-ancestors 'none'")
+            self.send_header("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self' blob:; connect-src 'self'; frame-ancestors 'none'")
             self.end_headers()
             self.wfile.write(raw)
 
@@ -105,7 +106,48 @@ def make_server(port, simulation):
                 return self.reply(200, page.encode(), "text/html; charset=utf-8")
             if self.path == "/api/config":
                 return self.reply(200, {"vision_configured": bool(os.environ.get("OLLAMA_MODEL")), "payment_enabled": False, "session_status": simulation.status()})
+            if self.path == "/motion.js":
+                return self.reply(200, Path(__file__).with_name("motion.js").read_bytes(), "text/javascript")
+            if self.path == "/media/demo-traffic.mp4":
+                return self.video()
             self.reply(404, {"error": "Not found"})
+
+        def video(self):
+            path = Path(__file__).parent / "media" / "demo-traffic.mp4"
+            size = path.stat().st_size
+            start, end = 0, size - 1
+            partial = self.headers.get("Range")
+            if partial:
+                match = re.fullmatch(r"bytes=(\d*)-(\d*)", partial)
+                if not match or not any(match.groups()):
+                    return self.reply(416, {"error": "Invalid byte range"})
+                first, last = match.groups()
+                if first:
+                    start = int(first)
+                    end = min(int(last), end) if last else end
+                else:
+                    start = max(0, size - int(last))
+                if start > end or start >= size:
+                    return self.reply(416, {"error": "Range outside video"})
+            self.send_response(206 if partial else 200)
+            self.send_header("Content-Type", "video/mp4")
+            self.send_header("Accept-Ranges", "bytes")
+            self.send_header("Content-Length", str(end - start + 1))
+            if partial:
+                self.send_header("Content-Range", "bytes %s-%s/%s" % (start, end, size))
+            self.end_headers()
+            try:
+                with path.open("rb") as source:
+                    source.seek(start)
+                    remaining = end - start + 1
+                    while remaining:
+                        chunk = source.read(min(65536, remaining))
+                        if not chunk:
+                            break
+                        self.wfile.write(chunk)
+                        remaining -= len(chunk)
+            except (BrokenPipeError, ConnectionResetError):
+                pass  # Normal when a browser pauses, seeks, or switches clips.
 
         def do_POST(self):
             if not self.valid_host() or not secrets.compare_digest(self.headers.get("X-Simulation-Token", ""), simulation.token):

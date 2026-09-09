@@ -69,6 +69,19 @@ class SimulatorTests(unittest.TestCase):
                     self.assertEqual(json.load(response)["action"], "simulated")
             with urllib.request.urlopen(base + "/api/config") as response:
                 self.assertEqual(json.load(response)["session_status"], "active")
+            media = Path(__file__).resolve().parents[1] / "parking_sentinel/media/demo-traffic.mp4"
+            request = urllib.request.Request(base + "/media/demo-traffic.mp4", headers={"Range": "bytes=0-31"})
+            with urllib.request.urlopen(request) as response:
+                self.assertEqual(response.status, 206)
+                self.assertEqual(response.read(), media.read_bytes()[:32])
+                self.assertEqual(response.headers['Content-Range'], 'bytes 0-31/%s' % media.stat().st_size)
+            request = urllib.request.Request(base + "/media/demo-traffic.mp4", headers={"Range": "bytes=-16"})
+            with urllib.request.urlopen(request) as response:
+                self.assertEqual(response.read(), media.read_bytes()[-16:])
+            request = urllib.request.Request(base + "/media/demo-traffic.mp4", headers={"Range": "bytes=999999999-"})
+            with self.assertRaises(urllib.error.HTTPError) as error:
+                urllib.request.urlopen(request)
+            self.assertEqual(error.exception.code, 416)
         finally:
             server.shutdown()
             server.server_close()
