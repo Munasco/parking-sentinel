@@ -1,0 +1,1 @@
+{"name":"parking-sentinel","private":true,"type":"module","engines":{"node":"24.x"},"scripts":{"build":"node scripts/build-web.mjs","dev":"node --env-file-if-exists=.env.local scripts/serve.mjs","test":"node --test tests/backend.test.mjs && node tests/test_preview.cjs"}}

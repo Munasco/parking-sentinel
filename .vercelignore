@@ -1,0 +1,12 @@
+.git
+.local
+.venv*
+.env*
+private
+snapshots
+__pycache__
+parking_sentinel/*.py
+parking_sentinel/__pycache__
+tests
+examples
+public

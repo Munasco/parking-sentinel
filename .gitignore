@@ -18,3 +18,9 @@ __pycache__/
 .venv-*/
 .DS_Store
 !parking_sentinel/media/parking-enforcement-staged-60s.mp4
+
+.vercel/
+public/
+node_modules/
+.vercel
+.env*

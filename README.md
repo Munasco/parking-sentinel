@@ -16,29 +16,33 @@ Python 3.9+, standard library only. No continuously streamed video. No private c
 
 ## Run
 
-### Single-file Gemini preview — no Python or Ollama
+### Video preview with server-side detection
 
-Download [`parking-preview.html`](parking-preview.html) and the [generated one-minute parking clip](parking_sentinel/media/parking-enforcement-staged-60s.mp4), or clone this repo. Open the HTML in a browser, choose the included MP4 from `parking_sentinel/media/`, and enter your own Gemini API key in the page. Click **Connect / load models**, choose an image-capable model, then **Start 60-second Gemini test**. The MP4 is already generated and committed: a fixed parked-car view, ordinary vehicles, and a staged white patrol-style vehicle with roof cameras. No video-generation service is needed to play it.
+[Open the live demo](https://parking-sentinel.vercel.app/), then click **Start monitoring**.
 
-No installation, WebGPU, video hosting, or local server is required. The file is self-contained; recognition requires internet access and a usable Gemini API key. Keys are held in page memory only and can be removed with **Forget key**. No credentials are bundled in the file or saved in browser storage. This is a personal bring-your-own-key demo, not a place to distribute a shared API credential.
+The web page plays the bundled one-minute generated parking video at 1×, with current observations and a detection timeline beside it. Ordinary cars pass a stationary parked-camera viewpoint; a patrol-style car appears later. Detection settings contain the confidence cutoff and optional known test plates. There are no scripted detection scenarios or payment actions.
 
-The browser detects pixel changes, samples at most one JPEG every five seconds, sends up to 12 images to Google's `generateContent` API, validates the returned observation, and applies the same plate/appearance rules as the Python version. Repeated matches are suppressed in page memory. Playback stops at 60 seconds or the end of a shorter clip. No payment call exists. Models and API quotas may vary; slow inference can skip events. The default confidence cutoff is 0.98 and can be changed visibly before a run. In an in-app browser test on the included clip, 0.98 rejected the patrol frames as uncertain; a second run at 0.95 sent 11 frames, flagged the patrol at 37.5 seconds, and suppressed a repeat at 48.1 seconds while earlier ordinary cars were ignored. These are observed results for this generated clip, not a guarantee for future runs or real footage.
+In a complete hosted browser test on September 9, 2026, seven frames were analyzed and the patrol was flagged in the frame captured at 44.7 seconds, with model-reported confidence 0.95. This is one observed run; inference timing and results can vary.
 
-API references: [Gemini image understanding](https://ai.google.dev/gemini-api/docs/image-understanding), [generateContent structured output](https://ai.google.dev/gemini-api/docs/generate-content/structured-output), [model listing](https://ai.google.dev/api/models).
+Gemini image recognition runs behind `/api/analyze` on the backend. The browser sends a JPEG only when it observes motion, at most once every five seconds and up to 12 times per run. Results appear when inference completes while the video keeps playing. Slow responses can miss brief events. A model's reported confidence is not a measured accuracy rate; the web preview starts at a 0.95 cutoff and is adjustable before a run. The CLI retains its stricter 0.98 default.
 
-### Local video preview
+The Gemini API key is a server-only environment variable, `GEMINI_API_KEY`. It is never embedded in the page or returned by the backend. Requests use a fixed parking-analysis prompt and a bounded JPEG input; clients cannot supply arbitrary model prompts. The deployed Vercel firewall limits `/api/analyze` to 24 requests per minute per IP. This is a rate limit, not a total spending cap.
+
+### Run locally
+
+Node.js 24 is required for the web backend. Put your own `GEMINI_API_KEY` in an ignored `.env.local`, then run:
 
 ```sh
-python3 -m parking_sentinel simulate
+npm run dev
 ```
 
-Open **http://127.0.0.1:8765**. The generated one-minute parking clip is already loaded. Preview it with the video controls, or enter your Gemini key, click **Connect / load models**, and then **Start 60-second Gemini test**. No Ollama or WebGPU is required. The server only serves the page and MP4; sampled images go directly from your browser to Gemini.
+Open **http://127.0.0.1:8765** and click **Start monitoring**. No browser-side key entry, Ollama, or WebGPU is required. `python3 -m parking_sentinel simulate` also launches this Node backend. To use another recording, expand **Change video** and choose a local MP4/WebM. Playback replays its first minute; this is not a live dashcam connection.
 
-The player compares decoded frames once per second. Motion triggers a JPEG sample at most once per five seconds, with up to 12 requests per run. Video plays at 1× while inference runs. The displayed observation, confidence check, and duplicate suppression use the model's actual response. There are no scripted scenarios or timed detection results. API latency can cause a brief event to be missed. A generated clip tests a staged case and does not establish accuracy on real parking footage.
+### Deploy on Vercel
 
-Playback is a prerecorded clip replayed in real time, not a live dashcam connection. Motion alone does not identify enforcement. Recognition requires a usable Gemini API key; playback does not. No payment or checkout endpoint is available in this preview.
+Set `GEMINI_API_KEY` in the project's Vercel environment variables, then deploy. The build copies only the web page and generated MP4 to the public output; the API functions use the server environment. The video is generated beforehand, so playback never invokes a video-generation API. Use Vercel Firewall rate limiting for any deployment with a shared server key.
 
-The generated test MP4 is the sole media exception in `.gitignore`; locally selected videos and snapshots are not committed. See [media provenance](parking_sentinel/media/ATTRIBUTION.md).
+See [media provenance](parking_sentinel/media/ATTRIBUTION.md) for how the staged clip was created. Generated footage can exercise this workflow but does not establish recognition accuracy on real enforcement vehicles.
 
 For the smaller terminal-only demo:
 

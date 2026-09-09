@@ -31,4 +31,6 @@ assert(!/localStorage|sessionStorage|indexedDB/.test(app));
 assert(!/AIza[\w-]{20,}/.test(html));
 const ids = new Set([...html.matchAll(/id="([^"]+)"/g)].map(match => match[1]));
 for (const match of app.matchAll(/\$\('([^']+)'\)/g)) assert(ids.has(match[1]), 'Missing element ' + match[1]);
-console.log('Standalone preview passed: rules, malformed model output, motion, DOM references, no embedded key or browser storage.');
+assert(!app.includes('generativelanguage.googleapis.com'));
+assert(!html.includes('id="key"'));
+console.log('Video preview passed: rules, model validation, motion, DOM references, server-only API access.');
