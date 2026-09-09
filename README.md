@@ -16,6 +16,18 @@ Python 3.9+, standard library only. No continuously streamed video. No private c
 
 ## Run
 
+### Single-file Gemini preview — no Python or Ollama
+
+Download [`parking-preview.html`](parking-preview.html), open it in a browser, choose your staged parking video from any local folder, and enter your own Gemini API key in the page. Click **Connect / load models**, choose an image-capable model, then **Start 60-second Gemini test**. The page contains a video-generation prompt for a fixed parked-car view, normal vehicles, and a white patrol-style vehicle with roof readers.
+
+No installation, WebGPU, video hosting, or local server is required. The file is self-contained; recognition requires internet access and a usable Gemini API key. Keys are held in page memory only and can be removed with **Forget key**. No credentials are bundled in the file or saved in browser storage. This is a personal bring-your-own-key demo, not a place to distribute a shared API credential.
+
+The browser detects pixel changes, samples at most one JPEG every five seconds, sends up to 12 images to Google's `generateContent` API, validates the returned observation, and applies the same plate/appearance rules as the Python version. Repeated matches are suppressed in page memory. Playback stops at 60 seconds or the end of a shorter clip. No payment call exists. Models and API quotas may vary; slow inference can skip events. The browser/API contract and matching rules are tested, but live Gemini recognition has not been validated with a user key or a staged target clip.
+
+API references: [Gemini image understanding](https://ai.google.dev/gemini-api/docs/image-understanding), [generateContent structured output](https://ai.google.dev/gemini-api/docs/generate-content/structured-output), [model listing](https://ai.google.dev/api/models).
+
+### Python test bench
+
 For a visual test, start the local simulator:
 
 ```sh

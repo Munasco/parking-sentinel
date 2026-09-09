@@ -18,4 +18,5 @@ jobs:
         with:
           node-version: '22'
       - run: node tests/test_motion.js
+      - run: node tests/test_preview.js
       - run: python -m parking_sentinel demo

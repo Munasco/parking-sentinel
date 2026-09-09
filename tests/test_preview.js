@@ -1,0 +1,31 @@
+const fs = require('node:fs');
+const vm = require('node:vm');
+const assert = require('node:assert/strict');
+const html = fs.readFileSync(require('node:path').join(__dirname, '../parking-preview.html'), 'utf8');
+const core = html.match(/<script id="detector-core">([\s\S]*?)<\/script>/)[1];
+const app = html.match(/<script id="app">([\s\S]*?)<\/script>/)[1];
+new vm.Script(app);
+const sandbox = {};
+vm.runInNewContext(core + '\nthis.detector = ParkingDetector;', sandbox);
+const detector = sandbox.detector;
+const observation = {plate:'', confidence:0.99, white:true, nissan:true, roof_lpr:true, blue_side_marking:true};
+assert.equal(detector.decide(observation, []), 'visual_match');
+assert.equal(detector.decide({...observation, plate:'DEMO 123', white:false}, ['demo123']), 'plate_match');
+assert.equal(detector.decide({...observation, confidence:0.6}, []), 'below_threshold');
+assert.equal(detector.decide({...observation, roof_lpr:false}, []), 'no_match');
+for (const bad of [{}, {...observation, confidence:NaN}, {...observation, white:'true'}, {...observation, extra:true}]) {
+  assert.throws(() => detector.decide(bad, []));
+}
+const response = {candidates:[{finishReason:'STOP', content:{parts:[{text:JSON.stringify(observation)}]}}]};
+assert.equal(detector.decide(detector.parseResponse(response), []), 'visual_match');
+assert.throws(() => detector.parseResponse({candidates:[{finishReason:'MAX_TOKENS'}]}));
+assert.throws(() => detector.parseResponse({candidates:[]}));
+const still = new Uint8ClampedArray(96 * 54 * 4);
+assert.equal(detector.moving(null, still), false);
+assert.equal(detector.moving(still, still), false);
+assert.equal(detector.moving(still, new Uint8ClampedArray(still.length).fill(180)), true);
+assert(!/localStorage|sessionStorage|indexedDB/.test(app));
+assert(!/AIza[\w-]{20,}/.test(html));
+const ids = new Set([...html.matchAll(/id="([^"]+)"/g)].map(match => match[1]));
+for (const match of app.matchAll(/\$\('([^']+)'\)/g)) assert(ids.has(match[1]), 'Missing element ' + match[1]);
+console.log('Standalone preview passed: rules, malformed model output, motion, DOM references, no embedded key or browser storage.');
